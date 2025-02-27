@@ -1,0 +1,15 @@
+{
+  "hash": "3b468a36",
+  "configHash": "53cf934b",
+  "lockfileHash": "b1aa99d2",
+  "browserHash": "1a02a5f7",
+  "optimized": {
+    "easemob-websdk/uniApp/Easemob-chat": {
+      "src": "../../../../../node_modules/easemob-websdk/uniApp/Easemob-chat.js",
+      "file": "easemob-websdk_uniApp_Easemob-chat.js",
+      "fileHash": "e8b6692d",
+      "needsInterop": true
+    }
+  },
+  "chunks": {}
+}

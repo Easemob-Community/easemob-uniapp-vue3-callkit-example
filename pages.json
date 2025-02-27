@@ -1,0 +1,183 @@
+{
+  "pages": [
+    //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+
+    {
+      "path": "pages/login/login",
+      "style": {
+        "navigationBarBackgroundColor": "#3E4091",
+        "navigationBarTextStyle": "white",
+        "backgroundTextStyle": "dark",
+        "navigationBarTitleText": "环信"
+      }
+    },
+    {
+      "path": "pages/home/index",
+      "style": {
+        "navigationBarBackgroundColor": "#f2f2f2",
+        "navigationBarTextStyle": "black"
+      }
+    },
+    {
+      "path": "pages/notification/notification",
+      "style": {
+        "navigationBarBackgroundColor": "#ffffff",
+        "navigationBarTextStyle": "black",
+        "backgroundTextStyle": "light",
+        "navigationBarTitleText": "系统通知"
+      }
+    },
+    {
+      "path": "pages/notificationGroupDetail/groupDetail",
+      "style": {
+        "navigationBarBackgroundColor": "#ffffff",
+        "backgroundTextStyle": "light",
+        "navigationBarTitleText": "群组通知"
+      }
+    },
+    {
+      "path": "pages/notificationFriendDetail/friendDetail",
+      "style": {
+        "navigationBarBackgroundColor": "#ffffff",
+        "backgroundTextStyle": "light",
+        "navigationBarTextStyle": "black",
+        "navigationBarTitleText": "好友通知"
+      }
+    },
+    {
+      "path": "pages/profile/profile",
+      "style": {
+        "navigationBarBackgroundColor": "#f2f2f2",
+        "navigationBarTextStyle": "black",
+        "navigationBarTitleText": "个人资料"
+      }
+    },
+    {
+      "path": "pages/profile/selectAvatar",
+      "style": {
+        "navigationBarBackgroundColor": "#f2f2f2",
+        "navigationBarTextStyle": "black",
+        "navigationBarTitleText": "选择头像"
+      }
+    },
+
+    {
+      "path": "pages/addNewFriend/addNewFriend",
+      "style": {
+        "navigationBarBackgroundColor": "#f2f2f2",
+        "navigationBarTextStyle": "black",
+        "navigationBarTitleText": "添加好友"
+      }
+    },
+    {
+      "path": "pages/addGroups/addGroups",
+      "style": {
+        "navigationBarBackgroundColor": "#f2f2f2",
+        "navigationBarTextStyle": "black",
+        "navigationBarTitleText": "创建群组"
+      }
+    },
+    {
+      "path": "pages/groupSetting/groupSetting",
+      "style": {
+        "navigationBarBackgroundColor": "#f2f2f2",
+        "navigationBarTextStyle": "black",
+        "navigationBarTitleText": "群信息"
+      }
+    },
+    {
+      "path": "pages/groups/groups",
+      "style": {
+        "navigationBarBackgroundColor": "#f2f2f2",
+        "navigationBarTextStyle": "black",
+        "navigationBarTitleText": "群组"
+      }
+    },
+    {
+      "path": "pages/moreMenu/moreMenu",
+      "style": {
+        "navigationBarBackgroundColor": "#f2f2f2",
+        "navigationBarTextStyle": "black",
+        "navigationBarTitleText": "更多配置"
+      }
+    },
+    {
+      "path": "pages/settingGeneral/settingGeneral",
+      "style": {
+        "navigationBarBackgroundColor": "#f2f2f2",
+        "navigationBarTextStyle": "black",
+        "navigationBarTitleText": "通用设置"
+      }
+    },
+    {
+      "path": "pages/searchMsg/searchMsg",
+      "style": {
+        "navigationBarBackgroundColor": "#f2f2f2",
+        "navigationBarTextStyle": "black",
+        "navigationBarTitleText": "历史记录"
+      }
+    },
+    {
+      "path": "pages/emChatContainer/index",
+      "style": {
+        "navigationBarTitleText": "emChat",
+        "backgroundTextStyle": "dark",
+        "app-plus": {
+          "bounce": "none",
+          "titleNView": {
+            "buttons": [
+              {
+                "text": "...",
+                "fontSrc": "./static/iconfont/iconfont.ttf",
+                "fontSize": "24",
+                "float": "right"
+              }
+            ]
+          }
+        }
+      }
+    },
+    // #ifdef APP-PLUS
+    {
+      "path": "pages/emCallKitPages/alertScreen",
+      "style": {
+        "app-plus": {
+          "titleNView": false
+        }
+      }
+    },
+    {
+      "path": "pages/emCallKitPages/singleCall",
+      "style": {
+        "app-plus": {
+          "titleNView": false
+        }
+      }
+    },
+    {
+      "path": "pages/emCallKitPages/multiCall",
+      "style": {
+        "app-plus": {
+          "titleNView": false
+        }
+      }
+    },
+    {
+      "path": "pages/emCallKitPages/inviteMembers",
+      "style": {
+        "navigationBarBackgroundColor": "#ffffff",
+        "navigationBarTextStyle": "black",
+        "backgroundTextStyle": "light",
+        "navigationBarTitleText": "邀请更多"
+      }
+    }
+    // #endif
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "uni-app",
+    "navigationBarBackgroundColor": "#F8F8F8",
+    "backgroundColor": "#F8F8F8"
+  },
+  "uniIdRouter": {}
+}
