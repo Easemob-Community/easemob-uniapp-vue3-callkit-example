@@ -71,22 +71,108 @@ demo 包含以下核心功能
 
 ## 简介
 
-> 很多时候我们可能需要在即时通讯的业务逻辑基础上增加音视频相关功能，因此为了方便集成我们在本 Demo 中增加了有关音视频相关的逻辑代码，可以作为参考，也可以进行部分复用。
+> 很多时候我们可能需要在即时通讯的业务逻辑基础上增加音视频相关功能,因此为了方便集成我们在本 Demo 中增加了有关音视频相关的逻辑代码,可以作为参考,也可以进行部分复用。
+
+## ⚠️ 重要变更说明
+
+**本项目已升级为本地插件引入方式,不再支持云端插件引入。**
+
+- **插件版本**: Agora RTC v3.7.2
+- **引入方式**: 本地 nativeplugins
+- **插件来源**: [Agora-Uniapp-SDK v3.7.2](https://github.com/AgoraIO-Community/Agora-Uniapp-SDK/releases/tag/v3.7.2)
+- **支持平台**: iOS / Android
+
+### 为什么改为本地引入?
+
+1. ❌ **云端插件已停止支持** - DCloud 插件市场的 Agora 云端插件已下架。
 
 ## 如何复用
 
-- 进入声网注册一个 appId 此 appId 与环信 appKey 概念类似，如何注册请参考[友情链接](https://docportal.shengwang.cn/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms)
-- 在已有的 HBuilderX 项目中导入相关音视频功能依赖插件【Agora（声网）提供的原生插件】
-  > 插件地址内含相关文档地址，以及具体导入方式建议仔细查看。
+### 1. 注册 Agora AppID
 
-[Agora-Native 插件](https://ext.dcloud.net.cn/plugin?id=3720)
+进入声网注册一个 appId,此 appId 与环信 appKey 概念类似,如何注册请参考[官方文档](https://docportal.shengwang.cn/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms)
 
-[Agora-JS 插件](https://ext.dcloud.net.cn/plugin?id=3741)
+### 2. 引入本地插件
 
-- 集成环信 uni-app 相关 SDK，按文档进行相关初始化配置并登录。
-- 复制本 Demo 中的`emCallKit`、pages 下`emCallKitPages`至自己的项目文件目录中（不要忘记参考本 Demo 配置 `pages.json` 中相关页面路由地址）。
+**📦 下载插件文件**
+
+从 [Agora-Uniapp-SDK v3.7.2](https://github.com/AgoraIO-Community/Agora-Uniapp-SDK/releases/tag/v3.7.2) 下载完整的插件包。
+
+**📁 放置插件文件**
+
+将解压后的 `Agora-RTC` 文件夹完整复制到项目根目录的 `nativeplugins/` 目录下:
+
+```
+项目根目录/
+└── nativeplugins/
+    └── Agora-RTC/
+        ├── ios/                    # iOS 平台插件
+        │   ├── AgoraCore.xcframework/
+        │   ├── AgoraRtcKit.xcframework/
+        │   ├── AgoraRtcUniPlugin.framework/
+        │   └── ...
+        ├── android/                # Android 平台插件
+        └── package.json
+```
+
+确保项目目录结构中包含 `nativeplugins` 文件夹:
+
+![nativeplugins目录结构](docs/images/nativeplugins-directory.png)
+
+**⚙️ 配置 manifest.json**
+
+在 HBuilderX 中打开 `manifest.json` 文件,点击 **安卓/iOS 原生插件配置**:
+
+![点击原生插件配置](docs/images/native-plugin-config.png)
+
+点击 **选择本地插件**,勾选 **Agora音视频插件**,然后点击 **确认**:
+
+![勾选本地插件](docs/images/select-local-plugin.png)
+
+
+
+**🔨 制作自定义基座**
+
+⚠️ **重要**: 使用本地插件必须制作自定义基座或打包后才能使用,标准基座不包含此插件。
+
+在 HBuilderX 中点击: `运行 -> 运行到手机或模拟器 -> 制作自定义调试基座`
+
+### 4. 验证插件配置
+
+制作好自定义基座后,运行以下代码验证插件是否正确加载:
+
+```javascript
+const AgoraRtcEngine = uni.requireNativePlugin('Agora-RTC-AgoraRtcEngineModule');
+console.log('Agora Plugin:', AgoraRtcEngine ? '加载成功' : '加载失败');
+```
+
+### 5. 参考资料
+
+~~[Agora-Native 插件](https://ext.dcloud.net.cn/plugin?id=3720)~~ (已废弃,请使用本地插件)
+
+~~[Agora-JS 插件](https://ext.dcloud.net.cn/plugin?id=3741)~~ (已废弃,请使用本地插件)
+
+
+
+### 6. 集成环信 SDK 与 CallKit
+
+**📦 Agora-RTC-JS 组件说明**
+
+本项目已包含 `Agora-RTC-JS` 组件(位于 `components/Agora-RTC-JS/`),该组件为 Agora 的 JavaScript API 封装,无需额外配置,可直接使用。组件包含:
+
+- **RtcEngine.native.js** - RTC 引擎核心功能
+- **RtcChannel.native.js** - 多频道管理
+- **RtcSurfaceView.nvue** / **RtcTextureView.nvue** - 视频渲染组件
+- **Classes.js** / **Enums.js** - 类型定义和枚举
+
+✅ 此组件已集成在项目中,无需修改,可直接参考 `components/Agora-RTC-JS/` 目录下的实现和使用方式。
+
+**🔧 集成步骤**
+
+- 集成环信 uni-app 相关 SDK,按文档进行相关初始化配置并登录。
+- 复制本 Demo 中的`emCallKit`、pages 下`emCallKitPages`至自己的项目文件目录中(不要忘记参考本 Demo 配置 `pages.json` 中相关页面路由地址)。
 - 将注册好的 appid 在`emCallKit`下的`config`中进行配置。
-- 在需要使用 Agora 音视频功能时需要将 IM 的实例传入到 callKit 组件内，参考代码如下。
+- 在需要使用 Agora 音视频功能时需要将 IM 的实例传入到 callKit 组件内,参考代码如下。
 
 ```js
 import { useInitCallKit } from "@/components/emCallKit";
