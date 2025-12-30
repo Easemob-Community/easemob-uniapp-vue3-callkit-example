@@ -1,6 +1,6 @@
 {
     "name" : "webim-uniapp-vue3-demo",
-    "appid" : "__UNI__EDADAE5",
+    "appid" : "__UNI__B04451D",
     "description" : "",
     "versionName" : "1.0.0",
     "versionCode" : 110,
@@ -59,12 +59,12 @@
                     "name" : "Agora音视频插件",
                     "description" : "Agora官方维护的音视频插件，并且在GitHub上开源，欢迎大家积极参与问题反馈和代码贡献",
                     "platforms" : "Android,iOS",
-                    "url" : "https://ext.dcloud.net.cn/plugin?id=3720",
-                    "android_package_name" : "uni.UNIF3583FD",
-                    "ios_bundle_id" : "com.easemob.demo.uniapp.webim",
-                    "isCloud" : true,
-                    "bought" : 1,
-                    "pid" : "3720",
+                    "url" : "",
+                    "android_package_name" : "",
+                    "ios_bundle_id" : "",
+                    "isCloud" : false,
+                    "bought" : -1,
+                    "pid" : "",
                     "parameters" : {}
                 }
             }
