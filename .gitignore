@@ -4,6 +4,12 @@ unpackage/
 # 依赖包
 node_modules/
 
+# 本地插件（文件过大，需从官方下载）
+nativeplugins/
+
+# HBuilderX 配置
+.hbuilderx/
+
 # 日志文件
 *.log
 npm-debug.log*
