@@ -272,26 +272,35 @@ const useAgoraChannelStore = defineStore('agoraChannelStore', {
     /**
      * @function requestRtcChannelToken
      * 该方法主要作用为请求Agora Rtc频道对应的token，其积极可抽象理解为拿到某频道对应的门钥匙。
-     * 使用环信SDK 4.9.1+ 内置的 getRTCToken 方法获取，无需额外HTTP请求。
+     * 【✅ SDK内置方法】使用环信SDK 4.17.0+ 内置的 getRTCToken 方法获取，无需额外HTTP请求。
      * 参考文档：https://doc.easemob.com/apidoc/web/modules/Contact.html#getRTCToken
      */
     requestRtcChannelToken() {
       const { channelName } = this.callKitStatus.channelInfos;
       const { CallKitEMClient } = useInitCallKit();
+      
+      console.log('%c[CallKit] 🚀 使用 SDK 内置方法获取 RTC Token', 'background:#07c160;color:#fff;padding:4px 8px;border-radius:4px;font-size:14px;');
+      console.log('%c[CallKit] 📞 频道名称:', 'color:#07c160;font-weight:bold;', channelName);
+      console.log('%c[CallKit] ⚠️ 注意: 旧版本使用 HTTP 请求，当前使用 SDK.getRTCToken()', 'color:#ff9800;font-size:12px;');
+      
       return new Promise((resolve, reject) => {
         CallKitEMClient.getRTCToken(channelName)
           .then((res) => {
-            console.log('>>>>>频道token已通过SDK获取', res);
+            console.log('%c[CallKit] ✅ SDK.getRTCToken 调用成功', 'background:#07c160;color:#fff;padding:4px 8px;border-radius:4px;');
+            console.log('%c[CallKit] 📦 返回数据:', 'color:#07c160;font-weight:bold;', res);
             // SDK返回的数据格式：{ RTCToken, RTCUId, appId, channelName, expire }
             const data = res?.data || res;
             const result = {
               accessToken: data?.RTCToken,
               agoraUserId: data?.RTCUId,
             };
+            console.log('%c[CallKit] 🎯 解析结果 - Token:', 'color:#1890ff;font-weight:bold;', result.accessToken?.substring(0, 20) + '...');
+            console.log('%c[CallKit] 🎯 解析结果 - UID:', 'color:#1890ff;font-weight:bold;', result.agoraUserId);
             resolve(result);
           })
           .catch((e) => {
-            console.error('>>>>rtc token 获取失败', e);
+            console.error('%c[CallKit] ❌ SDK.getRTCToken 调用失败', 'background:#ff4d4f;color:#fff;padding:4px 8px;border-radius:4px;');
+            console.error('%c[CallKit] 错误详情:', 'color:#ff4d4f;font-weight:bold;', e);
             uni.showToast({ icon: 'none', title: 'rtc token 获取失败' });
             reject(e);
           });
@@ -301,22 +310,30 @@ const useAgoraChannelStore = defineStore('agoraChannelStore', {
     /**
      * @function requestInChannelMapHxId
      * 该方法作用为拿到频道内uid与环信id的映射关系，例如在频道内展示uid与之对应的环信ID。
-     * 使用环信SDK 4.9.1+ 内置的 getUserIdByRTCUIds 方法获取，无需额外HTTP请求。
+     * 【✅ SDK内置方法】使用环信SDK 4.17.0+ 内置的 getUserIdByRTCUIds 方法获取，无需额外HTTP请求。
      * 参考文档：https://doc.easemob.com/apidoc/web/modules/Contact.html#getUserIdByRTCUIds
      */
     requestInChannelMapHxId(uidList) {
       const { CallKitEMClient } = useInitCallKit();
       const ids = Array.isArray(uidList) ? uidList : [uidList];
+      
+      console.log('%c[CallKit] 🚀 使用 SDK 内置方法获取 UID 映射', 'background:#722ed1;color:#fff;padding:4px 8px;border-radius:4px;font-size:14px;');
+      console.log('%c[CallKit] 📋 输入 UID 列表:', 'color:#722ed1;font-weight:bold;', ids);
+      console.log('%c[CallKit] ⚠️ 注意: 旧版本使用 HTTP 请求，当前使用 SDK.getUserIdByRTCUIds()', 'color:#ff9800;font-size:12px;');
+      
       return new Promise((resolve, reject) => {
         CallKitEMClient.getUserIdByRTCUIds(ids)
           .then((res) => {
-            console.log('>>>>>频道内uid映射已获取', res);
+            console.log('%c[CallKit] ✅ SDK.getUserIdByRTCUIds 调用成功', 'background:#722ed1;color:#fff;padding:4px 8px;border-radius:4px;');
+            console.log('%c[CallKit] 📦 返回数据:', 'color:#722ed1;font-weight:bold;', res);
             // SDK返回的数据格式：{ [RTCUId]: userId }
             const result = res?.data || res || {};
+            console.log('%c[CallKit] 🎯 UID 映射结果:', 'color:#1890ff;font-weight:bold;', result);
             resolve({ result });
           })
           .catch((e) => {
-            console.error('>>>>uid映射获取失败', e);
+            console.error('%c[CallKit] ❌ SDK.getUserIdByRTCUIds 调用失败', 'background:#ff4d4f;color:#fff;padding:4px 8px;border-radius:4px;');
+            console.error('%c[CallKit] 错误详情:', 'color:#ff4d4f;font-weight:bold;', e);
             uni.showToast({ icon: 'none', title: 'uid映射获取失败' });
             reject(e);
           });
