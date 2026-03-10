@@ -67,169 +67,383 @@ demo 包含以下核心功能
 |-app.css 一些全局样式
 ```
 
-# 音视频功能的实现
+# 📞 音视频通话(CallKit)集成指南
 
-## 简介
+## 📖 简介
 
-> 很多时候我们可能需要在即时通讯的业务逻辑基础上增加音视频相关功能,因此为了方便集成我们在本 Demo 中增加了有关音视频相关的逻辑代码,可以作为参考,也可以进行部分复用。
+CallKit 是基于环信 IM 和声网 Agora RTC 开发的音视频通话组件，支持以下功能：
+
+| 功能 | 说明 |
+|------|------|
+| 1对1语音通话 | 两人之间的纯语音通话 |
+| 1对1视频通话 | 两人之间的视频通话，支持切换摄像头 |
+| 多人音视频通话 | 最多支持 16 人同时在线的群通话 |
+| 通话邀请管理 | 支持接听、拒绝、忙线、超时等状态 |
+| 多端同步 | 支持多设备登录时的通话状态同步 |
+
+> 💡 **适用场景**：社交应用、在线客服、远程医疗、在线教育等需要实时音视频通话的场景。
+
+---
 
 ## ⚠️ 重要变更说明
 
-**本项目已升级为本地插件引入方式,不再支持云端插件引入。**
+### 本地插件引入（必须）
 
-- **插件版本**: Agora RTC v3.7.2
-- **引入方式**: 本地 nativeplugins
-- **插件来源**: [Agora-Uniapp-SDK v3.7.2](https://github.com/AgoraIO-Community/Agora-Uniapp-SDK/releases/tag/v3.7.2)
-- **支持平台**: iOS / Android
+**本项目已升级为本地插件引入方式，不再支持云端插件引入。**
 
-### 为什么改为本地引入?
+| 项目 | 说明 |
+|------|------|
+| 插件版本 | Agora RTC v3.7.2 |
+| 引入方式 | 本地 nativeplugins |
+| 下载地址 | [Agora-Uniapp-SDK v3.7.2](https://github.com/AgoraIO-Community/Agora-Uniapp-SDK/releases/tag/v3.7.2) |
+| 支持平台 | iOS / Android |
 
-1. ❌ **云端插件已停止支持** - DCloud 插件市场的 Agora 云端插件已下架。
+> ❌ **注意**：云端插件已停止支持，DCloud 插件市场的 Agora 云端插件已下架。
 
-## 如何复用
+### RTC Token 获取方式升级
 
-### 1. 注册 Agora AppID
+从本分支开始，RTC Token 获取方式已升级为使用**环信 SDK 内置方法**。
 
-进入声网注册一个 appId,此 appId 与环信 appKey 概念类似,如何注册请参考[官方文档](https://docportal.shengwang.cn/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms)
+| 对比项 | 旧方式 | 新方式 |
+|--------|--------|--------|
+| 获取方式 | 自行部署后端接口 | SDK 内置方法 |
+| 适用版本 | 任意 | `easemob-websdk@^4.9.1` |
+| 实现复杂度 | 高（需要后端开发） | 低（直接调用 SDK） |
+| 维护成本 | 高 | 低 |
 
-### 2. 引入本地插件
+**新方式使用的 API**：
+- `getRTCToken(channelName)` - 获取 RTC Token ([官方文档](https://doc.easemob.com/apidoc/web/modules/Contact.html#getRTCToken))
+- `getUserIdByRTCUIds(uidList)` - 获取 UID 与环信 ID 映射 ([官方文档](https://doc.easemob.com/apidoc/web/modules/Contact.html#getUserIdByRTCUIds))
 
-**📦 下载插件文件**
+---
+
+## 🚀 快速开始
+
+### 步骤 1：注册声网 AppID
+
+1. 访问 [声网开发者中心](https://docportal.shengwang.cn/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms)
+2. 注册并创建项目，获取 **App ID**
+3. 将 App ID 配置到 `components/emCallKit/config/index.js`：
+
+```javascript
+export const AGORA_APP_ID = '你的声网AppID';
+```
+
+### 步骤 2：配置本地插件
+
+#### 2.1 下载插件
 
 从 [Agora-Uniapp-SDK v3.7.2](https://github.com/AgoraIO-Community/Agora-Uniapp-SDK/releases/tag/v3.7.2) 下载完整的插件包。
 
-**📁 放置插件文件**
+#### 2.2 放置插件文件
 
-将解压后的 `Agora-RTC` 文件夹完整复制到项目根目录的 `nativeplugins/` 目录下:
+将解压后的 `Agora-RTC` 文件夹复制到项目根目录的 `nativeplugins/` 目录下：
 
 ```
 项目根目录/
 └── nativeplugins/
     └── Agora-RTC/
         ├── ios/                    # iOS 平台插件
-        │   ├── AgoraCore.xcframework/
-        │   ├── AgoraRtcKit.xcframework/
-        │   ├── AgoraRtcUniPlugin.framework/
-        │   └── ...
         ├── android/                # Android 平台插件
         └── package.json
 ```
 
-确保项目目录结构中包含 `nativeplugins` 文件夹:
+#### 2.3 配置 manifest.json
 
-![nativeplugins目录结构](docs/images/nativeplugins-directory.png)
+1. 在 HBuilderX 中打开 `manifest.json` 文件
+2. 点击 **安卓/iOS 原生插件配置**
+3. 点击 **选择本地插件**，勾选 **Agora音视频插件**
 
-**⚙️ 配置 manifest.json**
+#### 2.4 制作自定义基座
 
-在 HBuilderX 中打开 `manifest.json` 文件,点击 **安卓/iOS 原生插件配置**:
+⚠️ **重要**：使用本地插件**必须**制作自定义基座，标准基座不包含此插件。
 
-![点击原生插件配置](docs/images/native-plugin-config.png)
+在 HBuilderX 中点击：`运行 -> 运行到手机或模拟器 -> 制作自定义调试基座`
 
-点击 **选择本地插件**,勾选 **Agora音视频插件**,然后点击 **确认**:
+#### 2.5 验证插件配置
 
-![勾选本地插件](docs/images/select-local-plugin.png)
-
-
-
-**🔨 制作自定义基座**
-
-⚠️ **重要**: 使用本地插件必须制作自定义基座或打包后才能使用,标准基座不包含此插件。
-
-在 HBuilderX 中点击: `运行 -> 运行到手机或模拟器 -> 制作自定义调试基座`
-
-### 4. 验证插件配置
-
-制作好自定义基座后,运行以下代码验证插件是否正确加载:
+制作好自定义基座后，运行以下代码验证：
 
 ```javascript
 const AgoraRtcEngine = uni.requireNativePlugin('Agora-RTC-AgoraRtcEngineModule');
-console.log('Agora Plugin:', AgoraRtcEngine ? '加载成功' : '加载失败');
+console.log('Agora Plugin:', AgoraRtcEngine ? '✅ 加载成功' : '❌ 加载失败');
 ```
 
-### 5. 参考资料
+### 步骤 3：集成 CallKit 组件
 
-~~[Agora-Native 插件](https://ext.dcloud.net.cn/plugin?id=3720)~~ (已废弃,请使用本地插件)
+#### 3.1 复制组件文件
 
-~~[Agora-JS 插件](https://ext.dcloud.net.cn/plugin?id=3741)~~ (已废弃,请使用本地插件)
+将以下文件/目录复制到你的项目中：
 
+| 来源 | 目标 | 说明 |
+|------|------|------|
+| `components/emCallKit/` | `components/emCallKit/` | CallKit 核心组件 |
+| `components/Agora-RTC-JS/` | `components/Agora-RTC-JS/` | Agora RTC 封装组件 |
+| `pages/emCallKitPages/` | `pages/emCallKitPages/` | 通话页面 |
 
+#### 3.2 配置页面路由
 
-### 6. 集成环信 SDK 与 CallKit
+在 `pages.json` 中添加通话页面路由：
 
-> **⚠️ 重要更新说明**
->
-> 从本分支开始，RTC Token 获取方式已升级为使用**环信 SDK 内置方法**。
-> - **适用版本**: `easemob-websdk@^4.9.1`
-> - **变更方法**: 
->   - `getRTCToken(channelName)` - 获取 RTC Token ([文档](https://doc.easemob.com/apidoc/web/modules/Contact.html#getRTCToken))
->   - `getUserIdByRTCUIds(uidList)` - 获取 UID 与环信 ID 映射 ([文档](https://doc.easemob.com/apidoc/web/modules/Contact.html#getUserIdByRTCUIds))
-> - **优势**: 无需自行部署后端接口服务，直接通过 SDK 获取 RTC Token，简化集成流程。
+```json
+{
+  "pages": [
+    // ... 其他页面
+    {
+      "path": "pages/emCallKitPages/alertScreen",
+      "style": { "navigationBarTitleText": "来电提醒" }
+    },
+    {
+      "path": "pages/emCallKitPages/singleCall",
+      "style": { "navigationBarTitleText": "通话中" }
+    },
+    {
+      "path": "pages/emCallKitPages/multiCall",
+      "style": { "navigationBarTitleText": "多人通话" }
+    }
+  ]
+}
+```
 
-**📦 Agora-RTC-JS 组件说明**
+#### 3.3 初始化 CallKit
 
-本项目已包含 `Agora-RTC-JS` 组件(位于 `components/Agora-RTC-JS/`),该组件为 Agora 的 JavaScript API 封装,无需额外配置,可直接使用。组件包含:
+在应用启动时（如 `App.vue` 或登录成功后），初始化 CallKit：
 
-- **RtcEngine.native.js** - RTC 引擎核心功能
-- **RtcChannel.native.js** - 多频道管理
-- **RtcSurfaceView.nvue** / **RtcTextureView.nvue** - 视频渲染组件
-- **Classes.js** / **Enums.js** - 类型定义和枚举
-
-✅ 此组件已集成在项目中,无需修改,可直接参考 `components/Agora-RTC-JS/` 目录下的实现和使用方式。
-
-**🔧 集成步骤**
-
-- 集成环信 uni-app 相关 SDK,按文档进行相关初始化配置并登录。
-- 复制本 Demo 中的`emCallKit`、pages 下`emCallKitPages`至自己的项目文件目录中(不要忘记参考本 Demo 配置 `pages.json` 中相关页面路由地址)。
-- 将注册好的 appid 在`emCallKit`下的`config`中进行配置。
-- 在需要使用 Agora 音视频功能时需要将 IM 的实例传入到 callKit 组件内,参考代码如下。
-
-```js
+```javascript
 import { useInitCallKit } from "@/components/emCallKit";
+
+// 在适当的时机调用（如登录成功后）
 const { setCallKitClient } = useInitCallKit();
-//EMClient 为实例化后的IM，EaseSDK.message构建消息的方法
+
+// EMClient: 环信 IM 实例
+// EaseSDK.message: 消息构建方法
 setCallKitClient(EMClient, EaseSDK.message);
 ```
 
-> emCallKit 中还会将一些事件发布，主要作用为方便将频道内的一些动作通知到外层，比如收到邀请时，我们可能需要跳转至邀请页面。
+### 步骤 4：订阅通话事件
 
-```js
-//订阅频道内事件，收到邀请可选择跳转至邀请页面。
+CallKit 通过事件机制通知应用通话状态变化，你需要订阅这些事件来处理界面跳转等逻辑：
+
+```javascript
 import useCallKitEvent from "@/components/emCallKit/callKitManage/useCallKitEvent";
-const { EVENT_NAME, CALLKIT_EVENT_CODE, SUB_CHANNEL_EVENT } = useCallKitEvent();
+
+const { 
+  EVENT_NAME,           // 事件名称常量
+  CALLKIT_EVENT_CODE,   // 事件类型编码
+  SUB_CHANNEL_EVENT     // 订阅方法
+} = useCallKitEvent();
+
+// 订阅通话事件
 SUB_CHANNEL_EVENT(EVENT_NAME, (params) => {
   const { type, ext, callType, eventHxId } = params;
-  console.log(">>>>>>订阅到callkit事件发布", params);
-  //弹出待接听事件
+  console.log("📞 收到通话事件:", type.code, params);
+  
   switch (type.code) {
     case CALLKIT_EVENT_CODE.ALERT_SCREEN:
-      {
-        console.log(">>>>>>监听到对应code", type.code);
+      // 收到通话邀请，跳转到接听页面
+      uni.navigateTo({
+        url: "/pages/emCallKitPages/alertScreen",
+      });
+      break;
+      
+    case CALLKIT_EVENT_CODE.CALLEE_ACCPET:
+      // 对方已接听，跳转到通话页面
+      if (callType === 0 || callType === 1) {
+        // 单人通话
         uni.navigateTo({
-          url: "../emCallKitPages/alertScreen",
+          url: "/pages/emCallKitPages/singleCall",
+        });
+      } else {
+        // 多人通话
+        uni.navigateTo({
+          url: "/pages/emCallKitPages/multiCall",
         });
       }
       break;
-    case CALLKIT_EVENT_CODE.TIMEOUT:
-      {
-        console.log(">>>>>通话超时未接听");
-      }
+      
+    case CALLKIT_EVENT_CODE.CALLEE_REFUSE:
+      // 对方拒绝接听
+      uni.showToast({ title: "对方拒绝接听", icon: "none" });
       break;
-    default:
+      
+    case CALLKIT_EVENT_CODE.CALLEE_BUSY:
+      // 对方忙线中
+      uni.showToast({ title: "对方正忙", icon: "none" });
+      break;
+      
+    case CALLKIT_EVENT_CODE.TIMEOUT:
+      // 通话超时未接听
+      uni.showToast({ title: "通话超时", icon: "none" });
+      break;
+      
+    case CALLKIT_EVENT_CODE.CALLER_CANCEL:
+      // 对方取消呼叫
+      uni.showToast({ title: "对方已取消", icon: "none" });
       break;
   }
 });
 ```
 
-- 向他人发起音视频通话邀请
+### 步骤 5：发起通话
 
-```js
+#### 发起 1对1 语音通话
+
+```javascript
 import useAgoraChannelStore from "@/components/emCallKit/stores/channelManger";
 import { CALL_TYPES } from "@/components/emCallKit/contants";
+
 const agoraChannelStore = useAgoraChannelStore();
-//target 要呼叫的用户id 多人可传Array类型进去。
-//callType 要呼叫的类型 CALL_TYPES.SINGLE_VIDEO视频、CALL_TYPES.SINGLE_VOICE语音
-await agoraChannelStore.sendInviteMessage(target, callType);
+
+// targetId: 对方环信 ID
+await agoraChannelStore.sendInviteMessage(
+  targetId, 
+  CALL_TYPES.SINGLE_VOICE  // 语音通话
+);
 ```
+
+#### 发起 1对1 视频通话
+
+```javascript
+await agoraChannelStore.sendInviteMessage(
+  targetId, 
+  CALL_TYPES.SINGLE_VIDEO  // 视频通话
+);
+```
+
+#### 发起多人通话
+
+```javascript
+// 在群聊中发起多人音视频通话
+const memberList = ['user1', 'user2', 'user3']; // 群成员 ID 列表
+const groupId = '群ID';
+
+await agoraChannelStore.sendInviteMessage(
+  memberList,
+  CALL_TYPES.MULTI_VIDEO,  // 多人视频
+  groupId
+);
+```
+
+---
+
+## 📚 事件类型说明
+
+| 事件编码 | 说明 | 触发时机 |
+|----------|------|----------|
+| `ALERT_SCREEN` | 显示来电提醒 | 收到通话邀请时 |
+| `TIMEOUT` | 通话超时 | 30秒内未接听 |
+| `CALLEE_ACCPET` | 对方已接听 | 被叫方点击接听 |
+| `CALLEE_REFUSE` | 对方已拒绝 | 被叫方点击拒绝 |
+| `CALLEE_BUSY` | 对方忙线 | 被叫方正在通话中 |
+| `CALLER_CANCEL` | 对方已取消 | 主叫方取消呼叫 |
+| `CANCEL` | 已取消 | 通话被取消 |
+| `OTHER_HANDLE` | 其他设备已处理 | 多端登录时，其他设备处理了通话 |
+
+---
+
+## 🔄 通话状态流转
+
+```
+┌─────────────┐
+│    idle     │  <-- 初始状态/通话结束
+│   (空闲)     │
+└──────┬──────┘
+       │ 发起邀请 / 收到邀请
+       ▼
+┌─────────────┐
+│   alerting  │  <-- 响铃中
+│   (响铃)     │
+└──────┬──────┘
+       │ 被叫方发送 confirmRing
+       ▼
+┌─────────────┐
+│   inviting  │  <-- 等待接听
+│   (邀请中)   │
+└──────┬──────┘
+       │ 被叫方接听
+       ▼
+┌─────────────┐
+│ receivedAnswerCall │  <-- 收到接听响应
+│  (收到应答)   │
+└──────┬──────┘
+       │ 主叫方确认
+       ▼
+┌─────────────┐
+│ confirmCallee │  <-- 通话连接中
+│   (确认被叫)  │
+└──────┬──────┘
+       │ 加入频道成功
+       ▼
+┌─────────────┐
+│ answerCall  │  <-- 通话中
+│   (通话中)   │
+└──────┬──────┘
+       │ 挂断
+       ▼
+┌─────────────┐
+│    idle     │  <-- 回到空闲
+│   (空闲)     │
+└─────────────┘
+```
+
+---
+
+## 🛠️ 高级功能
+
+### 通话中操作
+
+在通话页面中，你可以使用以下方法控制通话：
+
+```javascript
+import useAgoraChannelStore from "@/components/emCallKit/stores/channelManger";
+import { CALLSTATUS } from "@/components/emCallKit/contants";
+
+const agoraChannelStore = useAgoraChannelStore();
+
+// 挂断通话
+agoraChannelStore.handleCancelCall();
+agoraChannelStore.updateLocalStatus(CALLSTATUS.idle);
+
+// 获取当前通话状态
+const status = agoraChannelStore.callKitStatus.localClientStatus;
+
+// 获取频道信息
+const channelInfo = agoraChannelStore.callKitStatus.channelInfos;
+```
+
+### 自定义通话邀请扩展信息
+
+如果需要传递额外的业务数据（如订单号、用户信息等），可以在发起邀请时添加扩展字段。
+
+---
+
+## ❓ 常见问题
+
+### Q1: 插件加载失败？
+
+**A**: 请检查：
+1. 是否已制作自定义基座
+2. `nativeplugins/Agora-RTC/` 目录结构是否正确
+3. `manifest.json` 中是否勾选了 Agora 插件
+
+### Q2: 通话接通后没有声音/画面？
+
+**A**: 请检查：
+1. 是否已申请麦克风/摄像头权限
+2. 声网 App ID 是否配置正确
+3. RTC Token 是否获取成功
+
+### Q3: 如何切换为旧版 Token 获取方式？
+
+**A**: 如果你需要自行部署后端接口获取 Token，可以修改 `components/emCallKit/stores/channelManger.js` 中的 `requestRtcChannelToken` 方法，改为 HTTP 请求方式。
+
+### Q4: 支持哪些平台？
+
+**A**: 目前支持 iOS 和 Android App 端，暂不支持 H5 和小程序。
+
+### Q5: 如何从短信验证码方式登录切换为用户 id+密码登陆？
+
+**A**: 在 `login/loginState` 中将 `usePwdLogin` 配置项改为 `false` 即可。
 
 # 常见问题
 
