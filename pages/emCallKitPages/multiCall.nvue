@@ -165,9 +165,9 @@ const addListeners = () => {
   state.engine.addListener('UserJoined', async (uid, elapsed) => {
     console.info('UserJoined', uid, elapsed);
     state.remoteUids = [...state.remoteUids, uid];
-    const { result } = await agoraChannelStore.requestInChannelMapHxId();
+    const { result } = await agoraChannelStore.requestInChannelMapHxId(uid);
     console.log('>>>>>>频道内环信ID获取完毕', result);
-    state.inChannelMapHxId = { ...result };
+    state.inChannelMapHxId = { ...state.inChannelMapHxId, ...result };
   });
   state.engine.addListener('UserOffline', (uid, reason) => {
     console.info('UserOffline', uid, reason);

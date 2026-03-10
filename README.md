@@ -156,6 +156,15 @@ console.log('Agora Plugin:', AgoraRtcEngine ? '加载成功' : '加载失败');
 
 ### 6. 集成环信 SDK 与 CallKit
 
+> **⚠️ 重要更新说明**
+>
+> 从本分支开始，RTC Token 获取方式已升级为使用**环信 SDK 内置方法**。
+> - **适用版本**: `easemob-websdk@^4.9.1`
+> - **变更方法**: 
+>   - `getRTCToken(channelName)` - 获取 RTC Token ([文档](https://doc.easemob.com/apidoc/web/modules/Contact.html#getRTCToken))
+>   - `getUserIdByRTCUIds(uidList)` - 获取 UID 与环信 ID 映射 ([文档](https://doc.easemob.com/apidoc/web/modules/Contact.html#getUserIdByRTCUIds))
+> - **优势**: 无需自行部署后端接口服务，直接通过 SDK 获取 RTC Token，简化集成流程。
+
 **📦 Agora-RTC-JS 组件说明**
 
 本项目已包含 `Agora-RTC-JS` 组件(位于 `components/Agora-RTC-JS/`),该组件为 Agora 的 JavaScript API 封装,无需额外配置,可直接使用。组件包含:

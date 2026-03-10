@@ -272,63 +272,54 @@ const useAgoraChannelStore = defineStore('agoraChannelStore', {
     /**
      * @function requestRtcChannelToken
      * 该方法主要作用为请求Agora Rtc频道对应的token，其积极可抽象理解为拿到某频道对应的门钥匙。
-     * !但此方法所请求的接口为环信内部Demo演示接口，仅供环信内部自己使用如自己项目使用。请找后端协助部署一个类似的接口服务。
+     * 使用环信SDK 4.9.1+ 内置的 getRTCToken 方法获取，无需额外HTTP请求。
+     * 参考文档：https://doc.easemob.com/apidoc/web/modules/Contact.html#getRTCToken
      */
     requestRtcChannelToken() {
       const { channelName } = this.callKitStatus.channelInfos;
-      const { apiUrl, appKey, loginUserId, accessToken } = this.emClientInfos;
-      const requestUrl = `${apiUrl}/token/rtcToken/v1?userAccount=${loginUserId}&channelName=${channelName}&appkey=${encodeURIComponent(
-        appKey
-      )}`;
+      const { CallKitEMClient } = useInitCallKit();
       return new Promise((resolve, reject) => {
-        uni.request({
-          url: requestUrl,
-          header: {
-            Authorization: `Bearer ${accessToken}`, //自定义请求头信息
-          },
-          success: (result) => {
-            console.log('>>>>>频道token已获取', result?.data);
-            resolve(result?.data);
-          },
-          fail: (e) => {
+        CallKitEMClient.getRTCToken(channelName)
+          .then((res) => {
+            console.log('>>>>>频道token已通过SDK获取', res);
+            // SDK返回的数据格式：{ RTCToken, RTCUId, appId, channelName, expire }
+            const data = res?.data || res;
+            const result = {
+              accessToken: data?.RTCToken,
+              agoraUserId: data?.RTCUId,
+            };
+            resolve(result);
+          })
+          .catch((e) => {
             console.error('>>>>rtc token 获取失败', e);
-            uni.showToast({ icon: 'none', title: 'rtc token 请求失败' });
+            uni.showToast({ icon: 'none', title: 'rtc token 获取失败' });
             reject(e);
-          },
-        });
+          });
       });
     },
 
     /**
      * @function requestInChannelMapHxId
-     * 该方法作用为拿到频道内uid与环信id的映射关系，例如在频道内展示uid与之对应的环信ID，因此需要该接口取到uid的映射关系，非必须接口，
-     * 但此Demo多人音视频通话中有用到。
-     * !同样此方法如果项目中需要类似的需求，也请后端协助搭建类型功能接口，供项目中使用。
+     * 该方法作用为拿到频道内uid与环信id的映射关系，例如在频道内展示uid与之对应的环信ID。
+     * 使用环信SDK 4.9.1+ 内置的 getUserIdByRTCUIds 方法获取，无需额外HTTP请求。
+     * 参考文档：https://doc.easemob.com/apidoc/web/modules/Contact.html#getUserIdByRTCUIds
      */
-    //请求频道内uid映射的环信id
-    requestInChannelMapHxId() {
-      const { channelName } = this.callKitStatus.channelInfos;
-      const { apiUrl, appKey, loginUserId, accessToken } = this.emClientInfos;
-      const requestUrl = `${apiUrl}/channel/mapper?userAccount=${loginUserId}&channelName=${channelName}&appkey=${encodeURIComponent(
-        appKey
-      )}`;
-      console.log('>>>>requestUrl', `Bearer ${accessToken}`);
+    requestInChannelMapHxId(uidList) {
+      const { CallKitEMClient } = useInitCallKit();
+      const ids = Array.isArray(uidList) ? uidList : [uidList];
       return new Promise((resolve, reject) => {
-        uni.request({
-          url: requestUrl,
-          header: {
-            Authorization: `Bearer ${accessToken}`, //自定义请求头信息
-          },
-          success: (result) => {
-            console.log('result', result?.data);
-            resolve(result?.data);
-          },
-          fail: (e) => {
-            console.error('>>>>rtc token 获取失败', e);
-            uni.showToast({ icon: 'none', title: 'rtc token 请求失败' });
+        CallKitEMClient.getUserIdByRTCUIds(ids)
+          .then((res) => {
+            console.log('>>>>>频道内uid映射已获取', res);
+            // SDK返回的数据格式：{ [RTCUId]: userId }
+            const result = res?.data || res || {};
+            resolve({ result });
+          })
+          .catch((e) => {
+            console.error('>>>>uid映射获取失败', e);
+            uni.showToast({ icon: 'none', title: 'uid映射获取失败' });
             reject(e);
-          },
-        });
+          });
       });
     },
   },
