@@ -130,11 +130,7 @@ CallKit 是基于环信 IM 和声网 Agora RTC 开发的音视频通话组件，
 
 ## 🚀 快速开始
 
-### 步骤 1：获取声网 AppID
-
-声网 AppID 可以通过以下两种方式获取：
-
-#### 方式一：通过环信控制台开通（推荐）
+### 步骤 1：开通实时音视频服务
 
 从环信 IM 4.17.0 版本开始，声网 AppID 可以通过环信控制台直接开通，无需单独注册声网账号。
 
@@ -152,20 +148,6 @@ export const AGORA_APP_ID = '从环信控制台获取的声网AppID';
 > - 无需单独注册声网账号
 > - AppID 与环信应用自动关联
 > - 可直接使用 SDK 内置方法获取 RTC Token
-
-#### 方式二：通过声网官网申请
-
-如果你已有声网账号，或需要更高级的声网功能配置，可以直接从声网获取：
-
-1. 访问 [声网开发者中心](https://docportal.shengwang.cn/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms)
-2. 注册并创建项目，获取 **App ID**
-3. 将 App ID 配置到 `components/emCallKit/config/index.js`：
-
-```javascript
-export const AGORA_APP_ID = '你的声网AppID';
-```
-
-> ⚠️ **注意**：使用此方式时，需要自行处理 AppID 与环信应用的关联配置。
 
 ### 步骤 2：配置本地插件
 
