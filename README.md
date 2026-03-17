@@ -111,6 +111,16 @@ CallKit 是基于环信 IM 和声网 Agora RTC 开发的音视频通话组件，
 
 > ❌ **注意**：云端插件已停止支持，DCloud 插件市场的 Agora 云端插件已下架。
 
+> ⚠️ **云打包限额提示**：
+> 
+> 由于本项目引入了声网原生插件（Agora RTC），插件体积较大，**云打包时可能超出 DCloud 云打包的免费/付费限额**。
+> 
+> **解决方案**：
+> 1. 自行购买或调整云打包限额（参考 [uniApp 云打包文档](https://uniapp.dcloud.net.cn/dev/app/cloud-build.html)）
+> 2. 使用**离线打包**方式（推荐），参考 [uniApp 离线打包文档](https://uniapp.dcloud.net.cn/dev/app/android/offline.html)
+> 
+> > 📌 原生插件体积较大，目前暂无更好的优化方案，请根据实际需求选择合适的打包方式。
+
 ### RTC Token 获取方式升级
 
 从本分支开始，RTC Token 获取方式已升级为使用**环信 SDK 内置方法**。
